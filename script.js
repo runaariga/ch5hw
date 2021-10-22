@@ -1,54 +1,81 @@
-// Display today's day and date
-var todayDate = moment().format('dddd, MMM Do YYYY');
-$("#currentDay").html(todayDate);
+var timeEl = $("#currentDay");
+var currentTime;
+clockUpdater();
+//Load data from local storage on start
+loadData();
 
-$(document).ready(function () {
-    // saveBtn click listener 
-    $(".saveBtn").on("click", function () {
-        // Get nearby values of the description in JQuery
-        var text = $(this).siblings(".description").val();
-        var time = $(this).parent().attr("id");
+//Set interval to constanstly update time
+var clock = setInterval(clockUpdater, 1000)
 
-        // Save text in local storage
+//Set current time and check time blocks
+function clockUpdater(){
+    currentTime = moment();
+    timeEl.text(currentTime);
+    checkTimeBlock();
+}
+
+//Color coordinate time blocks based on current time
+function checkTimeBlock(){
+    var currentHour = currentTime.hours();
+    var timeBlock = $(".time-block");
+    for(var i = 0; i < timeBlock.length; i++){
+        var block = timeBlock[i];
+        if(parseInt(block.id.split("-")[0]) < currentHour){
+            $(block).addClass("past");
+        }
+        else if(parseInt(block.id.split("-")[0]) === currentHour){
+            $(block).removeClass("past");
+            $(block).addClass("present");
+        }
+        else{
+            $(block).removeClass("past");
+            $(block).removeClass("present");
+            $(block).addClass("future");
+        }
+    }
+}
+
+//Save button click listener
+$(".saveBtn").on("click", saveClick);
+
+//Save input to local storage
+function saveClick(event){
+    var text = $(event.target).siblings(".description").val();
+    var time = $(event.target).parent().attr("id");
+
+    if(text === "")
+        alert("Type text into the field to save it on the calendar")
+    else{
         localStorage.setItem(time, text);
-    })
-   
-    function timeTracker() {
-        //get current number of hours.
-        var timeNow = moment().hour();
-
-        // loop over time blocks
-        $(".time-block").each(function () {
-            var blockTime = parseInt($(this).attr("id").split("hour")[1]);
-
-            // To check the time and add the classes for background indicators
-            if (blockTime < timeNow) {
-                $(this).removeClass("future");
-                $(this).removeClass("present");
-                $(this).addClass("past");
-            }
-            else if (blockTime === timeNow) {
-                $(this).removeClass("past");
-                $(this).removeClass("future");
-                $(this).addClass("present");
-            }
-            else {
-                $(this).removeClass("present");
-                $(this).removeClass("past");
-                $(this).addClass("future");
-
-            }
-        })
+        alert("Task has been saved");
     }
 
-    // Get item from local storage if any
-    $("#hour8 .description").val(localStorage.getItem("hour8"));
-    $("#hour9 .description").val(localStorage.getItem("hour9"));
-    $("#hour10 .description").val(localStorage.getItem("hour10"));
-    $("#hour11 .description").val(localStorage.getItem("hour11"));
-    $("#hour12 .description").val(localStorage.getItem("hour12"));
-    $("#hour13 .description").val(localStorage.getItem("hour13"));
-    $("#hour14 .description").val(localStorage.getItem("hour14"));
-    $("#hour15 .description").val(localStorage.getItem("hour15"));
-    $("#hour16 .description").val(localStorage.getItem("hour16"));
-    $("#hour17 .description").val(localStorage.getItem("hour17"));
+}
+
+//Clear button click listener
+$(".clearBtn").on("click", clearClick);
+
+//Save input to local storage
+function clearClick(event){
+    
+    var clear = confirm("Are you sure you want to clear your day calendar");
+
+    if(clear){
+        localStorage.clear();
+        loadData();
+    }
+    
+}
+
+//Load data from local storage to each time block
+function loadData(){ 
+    $('#9 .description').val(localStorage.getItem('9'));
+    $('#10 .description').val(localStorage.getItem('10'));
+    $('#11 .description').val(localStorage.getItem('11'));
+    $('#12 .description').val(localStorage.getItem('12'));
+    $('#13 .description').val(localStorage.getItem('13'));
+    $('#14 .description').val(localStorage.getItem('14'));
+    $('#15 .description').val(localStorage.getItem('15'));
+    $('#16 .description').val(localStorage.getItem('16'));
+    $('#17 .description').val(localStorage.getItem('17'));
+}
